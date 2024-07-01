@@ -4,11 +4,13 @@ import cors from "cors";
 import postRouter from "./apps/posts.js";
 import { client } from "./utils/db.js";
 import authRouter from "./apps/auth.js";
+import dotenv from "dotenv";
 
 async function init() {
   const app = express();
   const port = 4000;
-
+  // มีประกาศใช้ในบรรทัดที่ 66ไฟล์ auth.js เมื่อมีการเรียกใช้ เราจึงต้องมีการ execute config ให้ใช้งานได้
+  dotenv.config();
   await client.connect();
 
   app.use(cors());

@@ -29,17 +29,45 @@ authRouter.post("/register", async (req, res) => {
 // 🐨 Todo: Exercise #2
 // ให้สร้าง API เพื่อเอาไว้ Login ตัว User ตามตารางที่ออกแบบไว้
 authRouter.post("/login", async (req, res) => {
+  const user = await db.collection("user").findOne({
+    username: req.body.username,
+  });
+
+  console.log(req.body.username);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found.",
+    });
+  }
+
+  const isValidPassword = await bcrypt.compare(
+    req.body.password,
+    user.password
+  );
+
+  if (!isValidPassword) {
+    return res.status(400).json({
+      message: "Password not valid.",
+    });
+  }
+
   const token = jwt.sign(
+    // ข้อมูลที่ต้องเเนบเข้าไปใน payload สิ่งที่อยากให้โชว์บนหน้าเว็บไซต์
     {
-      id: user.id,
+      id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
     },
     process.env.SECRET_KEY,
     {
-      expiresIn: "86400000",
+      expiresIn: "1d",
     }
   );
+  return res.json({
+    message: "login successfully.",
+    token,
+  });
 });
 
 export default authRouter;
